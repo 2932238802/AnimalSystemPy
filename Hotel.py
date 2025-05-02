@@ -7,8 +7,8 @@ from Map import  KindToHappyWord
 
 class Hotel:
     _instance = None
-    __max_rect_num = 100                  # 最多只能有十个 方形
-    __max_circle_num = 100                # 最多只能有10个 圆形
+    __max_rect_num = 100               # 最多只能有十个 方形
+    __max_circle_num = 100             # 最多只能有10个 圆形
     hotel_rect_room = []               # 存放方形房间
     hotel_circle_room = []             # 存放圆形房间
     password_and_room = {}             # 密码和房间   左边是一个房卡 对应一个房间唯一标识符

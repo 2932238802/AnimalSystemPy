@@ -3,17 +3,17 @@ import os
 import socket
 import time
 import random
+import json
 from Animal import Animal
 from Common import AnimalKind
 from Map import KindToCnName
 
 
 # 这个是扩展的部分 老师：
-
 class PythonShellForAnimal:
     # 获取用户名字 和 主机名字 #
     # getcwd 这个是获取当前的工作目录 #
-    username_ = os.getlogin()
+    username_ = os.getenv("USER","默认用户")
     hostname_ = socket.gethostname()
     current_dir = os.getcwd()
     timestamp_ = time.time()
@@ -27,6 +27,7 @@ class PythonShellForAnimal:
             "droom":self.DeleRoom,
             "checkin": self.CheckIn,
             "checkout": self.CheckOut,
+            "save":self.Save,
             "exit":self.Exit,
             "help":self.ShowHelp,
             "showani":self.ShowAnimal,
@@ -36,8 +37,13 @@ class PythonShellForAnimal:
             "showroom":self.Showroom,
             "clear":self.Clear,
             "random": self.RandomHouse
+            
         }
         # 动物 #
+        # animal_contain   animal_name : Animal(obj) #
+        # hotel_rect_room  RectRoom(obj) #
+        # hotel_circle_room CircleRoom(obj) #
+        # password_and_room password : Room id #
         self.animal_contain = {}
         self.hotel_.hotel_rect_room = []
         self.hotel_.hotel_circle_room = []
@@ -257,6 +263,68 @@ class PythonShellForAnimal:
                             """
                 print(print_text)
                 return
+            
+    def Save(self,args_):
+        if len(args_) != 0:
+            print("用法错误")
+            print_text = """
+                        Save
+                        """
+            return
+        
+        else:
+            # 用法正确 : 保存数据到本地 #
+                animal_contain_data = {}
+                hotel_rect_root_data = {}
+                hotel_circle_root_data = {}
+                hotol_password_and_room = {}
+                
+                for animal_name,animal in self.animal_contain.items():
+                    animal_contain_data[animal_name] = {
+                        "x":animal.x_,
+                        "y":animal.y_,
+                        "z":animal.z_,
+                        "kind":animal.kind_,
+                        "room-card":animal.room_card
+                    }
+                
+                for rroom in self.hotel_.hotel_rect_room:
+                    hotel_rect_root_data[rroom.id_] = {
+                        "x" : rroom.x_,
+                        "y" : rroom.y_,
+                        "z" : rroom.z_,
+                        "has_animal" :rroom.has_animal
+                    }
+                    
+                for crrom in self.hotel_.hotel_circle_room :
+                    hotel_circle_root_data[crrom.id_] = {
+                        "r" : crrom.r_,
+                        "has_animal" : crrom.has_animal
+                    }
+                    
+                for passwd, roomid in self.hotel_.password_and_room.items():
+                    hotol_password_and_room[passwd] = roomid
+                    
+                print("加载文件中...")
+                full_data = {
+                "animal_contain_data": animal_contain_data,
+                "hotel_rect_root_data": hotel_rect_root_data,
+                "hotel_circle_root_data": hotel_circle_root_data,
+                "hotol_password_and_room": hotol_password_and_room
+                }
+                try:
+                    with open("./data.json", "w", encoding="utf-8") as file:  # 使用覆盖模式写入
+                        json.dump(full_data, file, indent=4, ensure_ascii=False)  # 格式化输出
+                        print("保存成功！")
+                except Exception as e:
+                    print(f"保存时发生错误: {e}")
+                 
+                # json.dump(animal_contain_data,file)
+                # json.dump(hotel_rect_root_data,file)
+                # json.dump(hotel_circle_root_data,file)
+                # json.dump(hotol_password_and_room,file)
+                
+        
 
     """
     展示创建的房间信息
@@ -317,6 +385,7 @@ class PythonShellForAnimal:
 
     def ShowHelp(self, args=None):
         help_text = """
+        
     可用命令:
       addrect <x(int)> <y(int)> <z(int)> <id(int)>
         添加方形房间
@@ -332,6 +401,9 @@ class PythonShellForAnimal:
 
       checkout <animal_name(str)>
         动物退房
+        
+      Save
+        将房间数据保存到本地的json文件
 
       showani
         显示所有动物

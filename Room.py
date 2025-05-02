@@ -7,6 +7,7 @@ class RectRoom:
         self.y_ = int(y)
         self.z_ = int(z)
         self.has_animal = False
+        
         # 唯一标识符 #
         self.id_ = id_out
 
@@ -24,3 +25,5 @@ class CircleRoom:
     def IsOkToIn(self,animal_out):
         return math.pi * self.r_**2 >= animal_out.GetSize()
 
+
+# 
