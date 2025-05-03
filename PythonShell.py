@@ -7,6 +7,8 @@ import json
 from Animal import Animal
 from Common import AnimalKind
 from Map import KindToCnName
+from Room import RectRoom
+from Room import CircleRoom
 
 
 # 这个是扩展的部分 老师：
@@ -28,6 +30,7 @@ class PythonShellForAnimal:
             "checkin": self.CheckIn,
             "checkout": self.CheckOut,
             "save":self.Save,
+            "load":self.Load,
             "exit":self.Exit,
             "help":self.ShowHelp,
             "showani":self.ShowAnimal,
@@ -275,9 +278,9 @@ class PythonShellForAnimal:
         else:
             # 用法正确 : 保存数据到本地 #
                 animal_contain_data = {}
-                hotel_rect_root_data = {}
-                hotel_circle_root_data = {}
-                hotol_password_and_room = {}
+                hotel_rect_room_data = {}
+                hotel_circle_room_data = {}
+                hotel_password_and_room = {}
                 
                 for animal_name,animal in self.animal_contain.items():
                     animal_contain_data[animal_name] = {
@@ -289,7 +292,7 @@ class PythonShellForAnimal:
                     }
                 
                 for rroom in self.hotel_.hotel_rect_room:
-                    hotel_rect_root_data[rroom.id_] = {
+                    hotel_rect_room_data[rroom.id_] = {
                         "x" : rroom.x_,
                         "y" : rroom.y_,
                         "z" : rroom.z_,
@@ -297,20 +300,20 @@ class PythonShellForAnimal:
                     }
                     
                 for crrom in self.hotel_.hotel_circle_room :
-                    hotel_circle_root_data[crrom.id_] = {
+                    hotel_circle_room_data[crrom.id_] = {
                         "r" : crrom.r_,
                         "has_animal" : crrom.has_animal
                     }
                     
                 for passwd, roomid in self.hotel_.password_and_room.items():
-                    hotol_password_and_room[passwd] = roomid
+                    hotel_password_and_room[passwd] = roomid
                     
                 print("加载文件中...")
                 full_data = {
                 "animal_contain_data": animal_contain_data,
-                "hotel_rect_root_data": hotel_rect_root_data,
-                "hotel_circle_root_data": hotel_circle_root_data,
-                "hotol_password_and_room": hotol_password_and_room
+                "hotel_rect_room_data": hotel_rect_room_data,
+                "hotel_circle_room_data": hotel_circle_room_data,
+                "hotel_password_and_room": hotel_password_and_room
                 }
                 try:
                     with open("./data.json", "w", encoding="utf-8") as file:  # 使用覆盖模式写入
@@ -320,9 +323,62 @@ class PythonShellForAnimal:
                     print(f"保存时发生错误: {e}")
                  
                 # json.dump(animal_contain_data,file)
-                # json.dump(hotel_rect_root_data,file)
-                # json.dump(hotel_circle_root_data,file)
-                # json.dump(hotol_password_and_room,file)
+                # json.dump(hotel_rect_room_data,file)
+                # json.dump(hotel_circle_room_data,file)
+                # json.dump(hotel_password_and_room,file)
+    
+        
+        """
+        文件加载
+        """
+    def Load(self,args):
+        if len(args)!=0 :
+            print("用法错误!")
+            print_text = """
+            Load
+            """
+        else:
+            load_file = None
+            try:
+                print("加载中...")
+                with open("./data.json","r",encoding="utf-8") as file:
+                    load_file = json.load(file)
+            except Exception as e:
+                print(f"加载时发生错误: {e}")
+            else:
+                try:
+                    self.hotel_.password_and_room = load_file['hotel_password_and_room']
+                    for rroom_id , rroom_info in load_file['hotel_rect_room_data'].items():
+                        x = rroom_info['x']
+                        y = rroom_info['y']
+                        z = rroom_info['z']
+                        has_animal = rroom_info['has_animal']
+                        rroom = RectRoom(x,y,z,rroom_id)
+                        rroom.has_animal = has_animal
+                        self.hotel_.hotel_rect_room.append(rroom)
+                    
+                    for croom_id, croom_info in load_file['hotel_circle_room_data'].items():
+                        r = croom_info['r']
+                        has_animal  = croom_info['has_animal']
+                        croom = CircleRoom(r,croom_id)
+                        croom.has_animal = has_animal
+                        self.hotel_.hotel_circle_room.append(croom)
+                    
+                    for animal_name, animal_info in load_file['animal_contain_data'].items():
+                        x = animal_info['x']
+                        y = animal_info['y']
+                        z = animal_info['z']
+                        kind = animal_info['kind']
+                        room_card = animal_info.get('room-card', None)  # 防止不存在时出错
+                        animal = Animal(animal_name, kind, x, y, z)
+                        animal.room_card = room_card
+                        self.animal_contain[animal_name] = animal
+                except Exception as e:
+                    print(f"加载到本地发生错误{e}")
+                else:
+                    print("加载完毕!")
+                    
+                
                 
         
 
@@ -405,6 +461,9 @@ class PythonShellForAnimal:
       Save
         将房间数据保存到本地的json文件
 
+      load
+        将本地的json文件中信息追加到本地
+        
       showani
         显示所有动物
 

@@ -8,7 +8,7 @@
             "room-card": "247643"
         }
     },
-    "hotel_rect_root_data": {
+    "hotel_rect_room_data": {
         "247643": {
             "x": 7,
             "y": 3,
@@ -22,13 +22,13 @@
             "has_animal": false
         }
     },
-    "hotel_circle_root_data": {
+    "hotel_circle_room_data": {
         "-1": {
             "r": 4,
             "has_animal": false
         }
     },
-    "hotol_password_and_room": {
+    "hotel_password_and_room": {
         "247643": "247643"
     }
 }
